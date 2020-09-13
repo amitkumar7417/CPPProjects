@@ -60,6 +60,9 @@ public:
 	void FindPathFromRootToNode(BinaryTreeNode<T> *root, T node, vector<BinaryTreeNode<T> *> path, vector<BinaryTreeNode<T> *>&output);
 	void VerticalSum(BinaryTreeNode<T> *root, int column, unordered_map<int, int>& output);
 	void ZigZagTraversal(BinaryTreeNode<T> *root);
+	BinaryTreeNode<T>* buildTreeFromPreOrderAndInorderTraversal(const vector<T>& inorder, const vector<T>& preorder);
+	BinaryTreeNode<T>* buildTreeFromPostOrderAndInorderTraversal(const vector<T>& inorder, const vector<T>& postorder);
+	BinaryTreeNode<T>* buildTreeFromLevelOrderandInorderTraversal(const vector<T>& inorder, const vector<T>& levelorder);
 };
 
 template <typename T>
@@ -683,4 +686,98 @@ void BinaryTree<T>::ZigZagTraversal(BinaryTreeNode<T> *root) {
 
 	currLevel->DeleteStack();
 	nxtLevel->DeleteStack();
+}
+
+template<typename T>
+BinaryTreeNode<T> * constructFromPreInOrder(int start, int end, const vector<int>& inorder, const vector<int>&preorder, int &pIndex, unordered_map<int, int> uMap) {
+	//Base Case
+	if (start > end)
+		return nullptr;
+
+	int val = preorder[pIndex++];
+	BinaryTreeNode * root = new BinaryTreeNode(val);
+	int index = uMap[val];
+	root->left = constructFromPreInOrder(start, index - 1, inorder, preorder, pIndex, uMap);
+	root->right = constructFromPreInOrder(index + 1, end, inorder, preorder, pIndex, uMap);
+	return root;
+}
+
+
+template<typename T>
+BinaryTreeNode<T>* BinaryTree<T>::buildTreeFromPreOrderAndInorderTraversal(const vector<T>& inorder, const vector<T>& preorder)
+{
+	int n = inorder.size();
+	//Create a hash table to store the index of inorder nodes;
+	unordered_map<int, int> uMap;
+	for (int i = 0; i < n; i++) {
+		uMap[inorder[i]] = i;
+	}
+
+	//This will keep track of the next unprocessed node in preOrder.
+	int pIndex = 0;
+
+	return constructFromPreInOrder(0, n - 1, inorder, preorder, pIndex, uMap);
+}
+
+template<typename T>
+BinaryTreeNode<T>* constructFromPostInOrder(int start, int end, const vector<int>& postorder, int &pIndex, unordered_map<int, int> &uMap) {
+	if (start > end) { //Base Condition
+		return nullptr;
+	}
+
+	int val = postorder[pIndex--];
+	BinaryTreeNode * root = new BinaryTreeNode(val);
+	int index = uMap[val];
+	root->right = constructFromPostInOrder(index + 1, end, postorder, pIndex, uMap);
+	root->left = constructFromPostInOrder(start, index - 1, postorder, pIndex, uMap);
+	return root;
+}
+
+template<typename T>
+BinaryTreeNode<T>* BinaryTree<T>::buildTreeFromPostOrderAndInorderTraversal(const vector<T>& inorder, const vector<T>& postorder)
+{
+	int n = inorder.size();
+	unordered_map<T, int> uMap;
+	for (int i = 0; i < n; i++) {
+		//Create a map for element and its index in inorder traversal
+		uMap[inorder[i]] = i;
+	}
+
+	int start = 0;
+	int end = n - 1;
+	int pIndex = n - 1; //In case of postorder traversal the root node will be in the end.
+	return constructFromPostInOrder(start, end, postorder, pIndex, uMap);
+}
+
+template<typename T>
+BinaryTreeNode<T> * constructFromLevelInOrder(int start, int end, const vector<T>& inorder, unordered_map<T, int>& uMap) {
+
+	if (start > end) //Base condition
+		return nullptr;
+
+	int index = start;
+	for (int i = start + 1; i <= end; i++) {
+		if (uMap[inorder[i]] < uMap[inorder[index]]) {
+			index = i;
+		}
+	}
+	BinaryTreeNode * root = new BinaryTreeNode(inorder[index]);
+
+	root->left = constructFromLevelInOrder(start, index - 1, inorder, uMap);
+	root->right = constructFromLevelInOrder(index + 1, end, inorder, uMap);
+
+	return root;
+
+
+}
+
+template<typename T>
+BinaryTreeNode<T>* BinaryTree<T>::buildTreeFromLevelOrderandInorderTraversal(const vector<T>& inorder, const vector<T>& levelorder)
+{
+	int n = inorder.size();
+	unordered_map<int, int> uMap;
+	for (int i = 0; i < n; i++) {
+		uMap[levelorder[i]] = i;
+	}
+	return constructFromLevelInOrder(0, n - 1, inorder, uMap);
 }

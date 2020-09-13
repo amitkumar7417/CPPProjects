@@ -172,7 +172,34 @@ int main()
 
 	cout << "Print ZigZag traversal of the tree" << endl;
 	bt.ZigZagTraversal(bt.getRoot());
+	
+	/*
 
+		  1
+	    /	 \
+	   /	  \
+	  2	       3
+     /	      / \
+    /	     /   \
+   4	    5	  6
+		   /       \
+          /         \
+         7	         8
+
+	cout << "Create binary tree from its inorder and preorder traversal" << endl;
+	vector<int> inorder = { 4, 2, 1, 7, 5, 8, 3, 6 };
+	vector<int> preorder = { 1, 2, 4, 3, 5, 7, 8, 6 };
+
+	cout << "Create binary tree from its inorder and postorder traversal" << endl;
+	vector<int> inorder = { 4, 2, 1, 7, 5, 8, 3, 6 };
+	vector<int> postorder = { 4, 2, 7, 8, 5, 6, 3, 1 };
+
+	cout << "Create binary tree from its levelorder and inorder traversal" << endl;
+	vector<int> inorder = { 4, 2, 5, 1, 6, 3, 7 };
+	vector<int> level = { 1, 2, 3, 4, 5, 6, 7 };
+
+	*/
 
 	return 0;
 }
+
